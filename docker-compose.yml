@@ -1,0 +1,41 @@
+version: '3.8'
+
+networks:
+  traefik-net:
+    external: true
+  keycloak-net:
+    external: true
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    command: --http-enabled
+    networks:
+      - traefik-net
+    ports:
+      - "9001:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/administrator/data/portainer:/data
+
+  portainer-auth-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:latest
+    container_name: portainer-auth-proxy
+    restart: unless-stopped
+    env_file:
+      - $HOME/projects/secrets/portainer.env
+    networks:
+      - traefik-net
+      - keycloak-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=traefik-net"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.ai-servicers.com`)"
+      - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.routers.portainer.tls=true"
+      - "traefik.http.routers.portainer.tls.certresolver=letsencrypt"
+      - "traefik.http.services.portainer.loadbalancer.server.port=4180"
+    depends_on:
+      - portainer
