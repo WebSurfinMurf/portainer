@@ -20,7 +20,7 @@ docker rm portainer-auth-proxy 2>/dev/null || true
 
 # Create data directory
 echo -e "${YELLOW}Creating Portainer data directory...${NC}"
-mkdir -p /home/administrator/data/portainer
+mkdir -p /home/administrator/projects/data/portainer
 
 # Deploy Portainer with Traefik labels directly
 echo -e "${GREEN}Deploying Portainer with Traefik...${NC}"
@@ -30,7 +30,7 @@ docker run -d \
   --network traefik-net \
   -p 9000:9000 \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  -v /home/administrator/data/portainer:/data \
+  -v /home/administrator/projects/data/portainer:/data \
   --label "traefik.enable=true" \
   --label "traefik.docker.network=traefik-net" \
   --label "traefik.http.routers.portainer.rule=Host(\`portainer.ai-servicers.com\`)" \

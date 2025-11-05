@@ -18,7 +18,7 @@ services:
       - "9001:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /home/administrator/data/portainer:/data
+      - /home/administrator/projects/data/portainer:/data
 
   portainer-auth-proxy:
     image: quay.io/oauth2-proxy/oauth2-proxy:latest

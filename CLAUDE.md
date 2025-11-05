@@ -48,7 +48,17 @@ Docker Socket (/var/run/docker.sock)
   - `/home/administrator/projects/portainer/deploy.sh` (Standard)
 - **Configuration**: `/home/administrator/projects/portainer/docker-compose.yml`
 - **Secrets**: `$HOME/projects/secrets/portainer.env`
-- **Data Volume**: `/home/administrator/data/portainer`
+- **Data Volume**: `/home/administrator/projects/data/portainer`
+
+## Recent Changes
+
+### Session: 2025-11-04
+- **Data Location Standardization**: Migrated to centralized data location
+  - Moved data from `/home/administrator/data/portainer` to `/home/administrator/projects/data/portainer`
+  - Updated all deployment scripts (deploy.sh, deploy-simple.sh, deploy-with-oauth2.sh)
+  - Updated docker-compose.yml with new path
+  - Container restarted successfully with new mount
+  - Follows project data standard: all runtime data in `projects/data/{project}/`
 
 ## Keycloak SSO Configuration
 
@@ -155,7 +165,7 @@ cd /home/administrator/projects/portainer
 - **Keep**: Provides alternative deployment option
 
 ## Data Persistence
-- **Volume**: /home/administrator/data/portainer
+- **Volume**: /home/administrator/projects/data/portainer
 - **Contents**:
   - Portainer database (SQLite)
   - User settings

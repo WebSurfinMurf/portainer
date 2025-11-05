@@ -37,7 +37,7 @@ docker rm portainer-auth-proxy 2>/dev/null || true
 
 # Create data directory
 echo -e "${YELLOW}Creating Portainer data directory...${NC}"
-mkdir -p /home/administrator/data/portainer
+mkdir -p /home/administrator/projects/data/portainer
 
 # Deploy Portainer (internal only, no Traefik labels)
 echo -e "${GREEN}Deploying Portainer application (internal)...${NC}"
@@ -47,7 +47,7 @@ docker run -d \
   --network traefik-net \
   --network-alias portainer-app \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  -v /home/administrator/data/portainer:/data \
+  -v /home/administrator/projects/data/portainer:/data \
   -p 9001:9000 \
   portainer/portainer-ce:latest \
   --http-enabled

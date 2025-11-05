@@ -49,9 +49,9 @@ done
 echo -e "${GREEN}✅ All required networks exist${NC}"
 
 # Create data directory
-if [ ! -d "/home/administrator/data/portainer" ]; then
+if [ ! -d "/home/administrator/projects/data/portainer" ]; then
     echo "Creating Portainer data directory..."
-    mkdir -p /home/administrator/data/portainer
+    mkdir -p /home/administrator/projects/data/portainer
 fi
 echo -e "${GREEN}✅ Portainer data directory ready${NC}"
 
