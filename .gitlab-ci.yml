@@ -16,6 +16,10 @@ stages:
 
 variables:
   ADMIN_HOME: /home/administrator
+  # Pin the compose project so deploy is independent of the CI checkout path
+  # (avoids colliding with the live `portainer` container created from
+  # projects/portainer).
+  COMPOSE_PROJECT_NAME: portainer
 
 validate:
   stage: validate
