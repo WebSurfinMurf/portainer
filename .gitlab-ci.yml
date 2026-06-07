@@ -1,0 +1,71 @@
+# GitLab-centric deploy for portainer (container management UI).
+#
+# Source of truth is GitLab. Pushes to main trigger validate + deploy + test.
+# After a successful deploy, the mirror stage pushes to GitHub as a backup.
+#
+# Runtime: the linuxserver-administrator runner (gitlab-runner-admin) is root
+# with the host docker socket and /home/administrator bind-mounted, so deploy
+# drives the host docker daemon directly. deploy.sh is `docker compose up -d`
+# (declarative/idempotent) — an unchanged push does not restart the container.
+
+stages:
+  - validate
+  - deploy
+  - test
+  - mirror
+
+variables:
+  ADMIN_HOME: /home/administrator
+
+validate:
+  stage: validate
+  tags: [shell, linuxserver, administrator]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "api"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  script:
+    - echo "Validating docker-compose.yml syntax..."
+    - python3 -c "import yaml; yaml.safe_load(open('docker-compose.yml'))" && echo "  docker-compose.yml OK"
+    - echo "Validating deploy.sh syntax..."
+    - bash -n deploy.sh
+    - echo "All validations passed."
+
+deploy:
+  stage: deploy
+  tags: [shell, linuxserver, administrator]
+  needs: [validate]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "api"'
+  script:
+    - export HOME="$ADMIN_HOME"
+    - ./deploy.sh
+  environment:
+    name: production
+
+test:
+  stage: test
+  tags: [shell, linuxserver, administrator]
+  needs: [deploy]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "api"'
+  script:
+    - sleep 5  # let containers settle
+    - docker inspect -f '{{.State.Running}}' portainer | grep -q true && echo "portainer running"
+    - docker inspect -f '{{.State.Running}}' portainer-auth-proxy | grep -q true && echo "portainer-auth-proxy running"
+
+mirror:
+  stage: mirror
+  tags: [shell, linuxserver, administrator]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main"'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "api"'
+  script:
+    - ./scripts/mirror-to-github.sh
+  allow_failure: true
