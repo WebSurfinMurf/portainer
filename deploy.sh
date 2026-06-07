@@ -82,7 +82,7 @@ echo -e "${GREEN}✅ Portainer is ready${NC}"
 
 echo ""
 echo "⏳ Waiting for OAuth2 proxy to be ready..."
-timeout 30 bash -c 'until docker logs portainer-auth-proxy 2>&1 | grep -q "listening on"; do sleep 2; done' || {
+timeout 30 bash -c 'until docker logs portainer-auth-proxy 2>&1 | grep -q "OAuthProxy configured"; do sleep 2; done' || {
     echo -e "${RED}❌ OAuth2 proxy failed to start${NC}"
     docker logs portainer-auth-proxy --tail 30
     exit 1
