@@ -73,9 +73,9 @@ docker compose up -d --remove-orphans
 # --- Post-deployment Validation ---
 echo ""
 echo "⏳ Waiting for Portainer to be ready..."
-timeout 30 bash -c 'until docker logs portainer-app 2>&1 | grep -q "http server listening"; do sleep 2; done' || {
+timeout 30 bash -c 'until docker logs portainer 2>&1 | grep -q "starting HTTP server"; do sleep 2; done' || {
     echo -e "${RED}❌ Portainer failed to start${NC}"
-    docker logs portainer-app --tail 30
+    docker logs portainer --tail 30
     exit 1
 }
 echo -e "${GREEN}✅ Portainer is ready${NC}"
@@ -94,7 +94,7 @@ echo ""
 echo "=========================================="
 echo "✅ Portainer Deployment Summary"
 echo "=========================================="
-echo "Containers: portainer-app, portainer-auth-proxy"
+echo "Containers: portainer, portainer-auth-proxy"
 echo "Image: portainer/portainer-ce:latest"
 echo "Networks: traefik-net, keycloak-net"
 echo ""
@@ -109,7 +109,7 @@ echo ""
 echo "=========================================="
 echo ""
 echo "📊 View logs:"
-echo "   docker logs portainer-app -f"
+echo "   docker logs portainer -f"
 echo "   docker logs portainer-auth-proxy -f"
 echo ""
 echo "✅ Deployment complete!"
